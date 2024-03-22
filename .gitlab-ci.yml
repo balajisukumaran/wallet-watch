@@ -27,4 +27,4 @@ build_server:
 deploy:
   stage: deploy
   script:
-    - echo "Running application..."
+    - docker-compose -f docker-compose.yml up -d
