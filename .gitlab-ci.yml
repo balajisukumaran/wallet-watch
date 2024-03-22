@@ -30,6 +30,7 @@ build_server:
 deploy:
   stage: deploy
   script:
+    - docker images
     - echo "$DOCKERHUB_PASSWORD" | docker login -u $DOCKERHUB_USERNAME --password-stdin
     - docker push $DOCKERHUB_USERNAME/wallet-watch:ui
     - docker push $DOCKERHUB_USERNAME/wallet-watch:server
