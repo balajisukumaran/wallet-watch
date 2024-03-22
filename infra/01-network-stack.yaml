@@ -1,0 +1,151 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: WalletWatch VPC setup with public and private subnets for EC2 and RDS respectively.
+
+Resources:
+  WalletWatchVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: WalletWatchVPC
+
+  WalletWatchPublicSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref WalletWatchVPC
+      CidrBlock: 10.0.1.0/24
+      MapPublicIpOnLaunch: true
+      AvailabilityZone: us-east-1a
+      Tags:
+        - Key: Name
+          Value: WalletWatchPublicSubnet
+
+  WalletWatchPrivateSubnetA:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref WalletWatchVPC
+      CidrBlock: 10.0.3.0/24
+      AvailabilityZone: us-east-1a
+      Tags:
+        - Key: Name
+          Value: WalletWatchPrivateSubnetA
+
+  WalletWatchPrivateSubnetB:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref WalletWatchVPC
+      CidrBlock: 10.0.4.0/24
+      AvailabilityZone: us-east-1b
+      Tags:
+        - Key: Name
+          Value: WalletWatchPrivateSubnetB
+
+  WalletWatchDBSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: "DB subnet group for WalletWatch RDS"
+      SubnetIds:
+        - !Ref WalletWatchPrivateSubnetA
+        - !Ref WalletWatchPrivateSubnetB
+      Tags:
+        - Key: Name
+          Value: WalletWatchDBSubnetGroup
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: WalletWatchInternetGateway
+
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref WalletWatchVPC
+      InternetGatewayId: !Ref InternetGateway
+
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref WalletWatchVPC
+      Tags:
+        - Key: Name
+          Value: WalletWatchPublicRouteTable
+
+  PublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: AttachGateway
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+  SubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref WalletWatchPublicSubnet
+      RouteTableId: !Ref PublicRouteTable
+
+  EC2SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow SSH and HTTP to EC2 instance
+      VpcId: !Ref WalletWatchVPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+
+  RDSSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow access from EC2 instances to RDS
+      VpcId: !Ref WalletWatchVPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 3306
+          ToPort: 3306
+          SourceSecurityGroupId: !Ref EC2SecurityGroup
+
+Outputs:
+  VPCId:
+    Description: VPC ID
+    Value: !Ref WalletWatchVPC
+    Export:
+      Name: { "Fn::Sub": "${AWS::StackName}-VPCId" }
+
+  PublicSubnetId:
+    Description: Public Subnet ID
+    Value: !Ref WalletWatchPublicSubnet
+    Export:
+      Name: { "Fn::Sub": "${AWS::StackName}-PublicSubnetId" }
+
+  DBSubnetGroupName:
+    Description: "The name of the RDS DB Subnet Group"
+    Value: !Ref WalletWatchDBSubnetGroup
+    Export:
+      Name: !Sub "${AWS::StackName}-DBSubnetGroupName"
+
+  EC2SecurityGroupId:
+    Description: EC2 Security group ID
+    Value: !Ref EC2SecurityGroup
+    Export:
+      Name: { "Fn::Sub": "${AWS::StackName}-EC2SecurityGroupId" }
+
+  RDSSecurityGroupId:
+    Description: RDS Security group ID
+    Value: !Ref RDSSecurityGroup
+    Export:
+      Name: { "Fn::Sub": "${AWS::StackName}-RDSSecurityGroupId" }
+
+  PublicSubnetRouteTable:
+    Description: Route Table for the Public Subnet
+    Value: !Ref PublicRouteTable

@@ -1,0 +1,40 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: CloudFormation template for RDS instance and S3 bucket for image storage.
+
+Resources:
+  WalletWatchRDSInstance:
+    Type: "AWS::RDS::DBInstance"
+    Properties:
+      Engine: "mysql"
+      DBInstanceClass: "db.t2.micro"
+      AllocatedStorage: "20"
+      DBInstanceIdentifier: !Sub "${AWS::StackName}-rds-instance"
+      MasterUsername: "admin"
+      MasterUserPassword: "Alienware17r2!"
+      DBSubnetGroupName: !ImportValue NETWORK-STACK-DBSubnetGroupName
+      VPCSecurityGroups:
+        - !ImportValue NETWORK-STACK-RDSSecurityGroupId
+      BackupRetentionPeriod: 7
+      MultiAZ: false
+      StorageType: gp2
+      PubliclyAccessible: false
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-RDS"
+
+  WalletWatchS3Bucket:
+    Type: "AWS::S3::Bucket"
+    Properties:
+      BucketName: !Sub "wallet-watch-blob-storage-${AWS::AccountId}-${AWS::Region}"
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-S3-Bucket"
+
+Outputs:
+  RDSInstanceEndpoint:
+    Description: "Connect to this endpoint with your DB credentials"
+    Value: !GetAtt "WalletWatchRDSInstance.Endpoint.Address"
+
+  S3BucketName:
+    Description: "The name of the S3 bucket for image storage"
+    Value: !Ref WalletWatchS3Bucket

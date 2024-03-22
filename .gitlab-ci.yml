@@ -1,0 +1,37 @@
+stages:
+  - build
+  - deploy
+  - run
+
+variables:
+  DOCKERHUB_USERNAME: balajisukumaran96
+
+build_ui:
+  stage: build
+  script:
+    - cd ui/walletwatch-dashboard
+    - echo $PATH
+    - docker build -t wallet-watch:ui .
+    - docker tag wallet-watch:ui $DOCKERHUB_USERNAME/wallet-watch:ui
+
+build_server:
+  stage: build
+  script:
+    - cd server/com.walletwatch.api
+    - docker build -t wallet-watch:server .
+    - docker tag wallet-watch:server $DOCKERHUB_USERNAME/wallet-watch:server
+
+deploy:
+  stage: deploy
+  script:
+    - echo "$DOCKERHUB_PASSWORD" | docker login -u $DOCKERHUB_USERNAME --password-stdin
+    - docker push $DOCKERHUB_USERNAME/wallet-watch:ui
+    - docker push $DOCKERHUB_USERNAME/wallet-watch:server
+  only:
+    - master # or the branch you want to deploy from
+
+# Placeholder for run stage
+# run:
+#   stage: run
+#   script:
+#     - echo "Running application..."

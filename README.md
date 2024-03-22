@@ -1,4 +1,4 @@
-# wallet_watch
+# wallet-watch
 
 
 
@@ -15,14 +15,14 @@ Already a pro? Just edit this README.md and make it your own. Want to make it ea
 
 ```
 cd existing_repo
-git remote add origin https://git.cs.dal.ca/sukumaran/wallet_watch.git
+git remote add origin https://git.cs.dal.ca/sukumaran/wallet-watch.git
 git branch -M main
 git push -uf origin main
 ```
 
 ## Integrate with your tools
 
-- [ ] [Set up project integrations](https://git.cs.dal.ca/sukumaran/wallet_watch/-/settings/integrations)
+- [ ] [Set up project integrations](https://git.cs.dal.ca/sukumaran/wallet-watch/-/settings/integrations)
 
 ## Collaborate with your team
 
