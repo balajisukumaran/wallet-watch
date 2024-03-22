@@ -13,12 +13,39 @@ Parameters:
     Type: String
 
 Resources:
-  WalletWatchEC2Instance:
+  SecretsManagerAccessRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: AccessSecretsManager
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - secretsmanager:GetSecretValue
+                Resource: !ImportValue "SECRET-STACK-SecretArn"
+
+  EC2InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+        - Ref: SecretsManagerAccessRole
+
+  WalletWatchEC2:
     Type: AWS::EC2::Instance
     Properties:
       ImageId: ami-0bef12ee7bc073414
       InstanceType: t2.micro
       KeyName: !Ref KeyName
+      IamInstanceProfile: !Ref EC2InstanceProfile
       SecurityGroupIds:
         - !ImportValue "NETWORK-STACK-EC2SecurityGroupId"
       SubnetId: !ImportValue "NETWORK-STACK-PublicSubnetId"
@@ -54,7 +81,7 @@ Resources:
                   - "ec2:DeleteNetworkInterface"
                 Resource: "*"
 
-  MyJavaLambdaFunction:
+  WalletWatchLambda:
     Type: AWS::Lambda::Function
     Properties:
       Code:
