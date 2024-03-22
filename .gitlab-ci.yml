@@ -18,17 +18,19 @@ build_ui:
     - echo $PATH
     - docker build -t wallet-watch:ui .
     - docker tag wallet-watch:ui $DOCKERHUB_USERNAME/wallet-watch:ui
+    - echo "$DOCKERHUB_PASSWORD" | docker login -u $DOCKERHUB_USERNAME --password-stdin
     - docker push $DOCKERHUB_USERNAME/wallet-watch:ui
-
+    
 build_server:
   stage: build
   script:
     - cd server/com.walletwatch.api
     - docker build -t wallet-watch:server .
     - docker tag wallet-watch:server $DOCKERHUB_USERNAME/wallet-watch:server
+    - echo "$DOCKERHUB_PASSWORD" | docker login -u $DOCKERHUB_USERNAME --password-stdin
     - docker push $DOCKERHUB_USERNAME/wallet-watch:server
 
 deploy:
   stage: deploy
   script:
-    - echo "Deploying application..."
+    - echo "Running application..."
