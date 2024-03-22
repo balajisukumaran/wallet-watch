@@ -25,7 +25,8 @@ build_server:
   stage: build
   script:
     - cd server/com.walletwatch.api
-    - docker build -t wallet-watch:server .
+    - docker build --build-arg AWS_ACCESS_KEY_ID = $AWS_ACCESS_KEY_ID --build-arg AWS_SECRET_ACCESS_KEY = $AWS_SECRET_ACCESS_KEY -t wallet-watch:server .
+    #- docker build -t wallet-watch:server .
     - docker tag wallet-watch:server $DOCKERHUB_USERNAME/wallet-watch:server
     - echo "$DOCKERHUB_PASSWORD" | docker login -u $DOCKERHUB_USERNAME --password-stdin
     - docker push $DOCKERHUB_USERNAME/wallet-watch:server
