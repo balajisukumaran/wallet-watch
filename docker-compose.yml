@@ -1,0 +1,22 @@
+services:
+  container1:
+    image: balajisukumaran96/wallet-watch:server
+    volumes:
+      - .:/usr/src/api
+    ports:
+      - 6000:6000
+    networks:
+      - docker-assignment-network
+
+  container2:
+    image: balajisukumaran96/wallet-watch:ui
+    volumes:
+      - .:/usr/src/ui
+    ports:
+      - 3000:3000
+    networks:
+      - docker-assignment-network
+
+networks:
+  docker-assignment-network:
+    driver: bridge
