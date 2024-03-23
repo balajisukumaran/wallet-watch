@@ -10,7 +10,7 @@ build_ui:
   script:
     - cd ui/walletwatch-dashboard
     - echo $PATH
-    - docker build -t wallet-watch:ui .
+    - DOCKER_BUILDKIT=1 docker build -t wallet-watch:ui .
     - docker tag wallet-watch:ui $DOCKERHUB_USERNAME/wallet-watch:ui
     - echo "$DOCKERHUB_PASSWORD" | docker login -u $DOCKERHUB_USERNAME --password-stdin
     - docker push $DOCKERHUB_USERNAME/wallet-watch:ui
@@ -27,4 +27,4 @@ build_server:
 deploy:
   stage: deploy
   script:
-    - echo "Running application..."
+    - docker-compose -f docker-compose.yml up -d
