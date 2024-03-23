@@ -2,6 +2,7 @@ package com.walletwatch.controller.transformer;
 
 import com.walletwatch.dtos.TransactionDto;
 import com.walletwatch.entities.*;
+import java.util.*;
 
 public class DtoToEntity {
     public static Transaction ToEntity(TransactionDto transactionDto){
@@ -15,16 +16,16 @@ public class DtoToEntity {
         transaction.setCategoryId(category);
         transaction.setReminder(reminderType);
 
-        transaction.setTransactionId(transactionDto.transactionId());
-        transaction.getUser().setUserId(transactionDto.userId());
-        transaction.getCategoryId().setCategoryId(transactionDto.categoryId());
-        transaction.getReminder().setReminderTypeId(transactionDto.reminderTypeId());
-        transaction.setName(transactionDto.name());
-        transaction.setDescription(transactionDto.description());
-        transaction.setEnableReminder(transactionDto.enableReminder());
-        transaction.setPaymentDate(transactionDto.paymentDate());
-        transaction.setPrice(transactionDto.price());
-        transaction.setUrl(transactionDto.invoiceUrl());
+        transaction.setTransactionId(transactionDto.getTransactionId());
+        transaction.getUser().setUserId(transactionDto.getUserId());
+        transaction.getCategoryId().setCategoryId(transactionDto.getCategoryId());
+        transaction.getReminder().setReminderTypeId(transactionDto.getReminderTypeId());
+        transaction.setName(transactionDto.getName());
+        transaction.setDescription(transactionDto.getDescription());
+        transaction.setEnableReminder(transactionDto.getEnableReminder());
+        transaction.setPaymentDate(transactionDto.getPaymentDate());
+        transaction.setPrice(transactionDto.getPrice());
+        transaction.setUrl(transactionDto.getInvoiceUrl());
 
         return transaction;
     }

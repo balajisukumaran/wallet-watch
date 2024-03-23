@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class TransactionService implements ITransactionService {
@@ -32,5 +34,12 @@ public class TransactionService implements ITransactionService {
     public void deleteTransaction(Transaction transaction) {
         Transaction transactionDb= transactionRepository.findByTransactionId(transaction.getTransactionId());
         transactionRepository.delete(transactionDb);
+    }
+
+    @Override
+    public List<Transaction> getAll(int userId) {
+        List<Transaction> transactions = transactionRepository.findAll();
+        List<Transaction> result = transactions.stream().filter(transaction -> transaction.getUser().getUserId() == userId).toList();
+        return result;
     }
 }
