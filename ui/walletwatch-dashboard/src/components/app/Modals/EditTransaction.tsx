@@ -4,12 +4,11 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { budgetSchema } from "@/lib/schema";
+import { transactionSchema } from "@/lib/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CalendarIcon, PlusCircle } from "lucide-react";
+import { CalendarIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import {
   Form,
@@ -20,6 +19,14 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { z } from "zod";
+import { useEffect } from "react";
+import useTransactionMutation from "@/hooks/useTransactionMutation";
+import {
+  CATEGORIES,
+  CATEGORIES_IDS,
+  REMINDERS,
+  REMINDERS_IDS,
+} from "@/api/api.constants";
 import {
   Select,
   SelectContent,
@@ -28,62 +35,44 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  CATEGORIES,
-  CATEGORIES_IDS,
-  REMINDERS,
-  REMINDERS_IDS,
-} from "@/api/api.constants";
-import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
-import { cn } from "@/lib/utils";
 import { format } from "date-fns";
-import useBudgetMutation from "@/hooks/useBudgetMutation";
-import { useEffect, useRef } from "react";
-import { DialogClose } from "@radix-ui/react-dialog";
+import { cn } from "@/lib/utils";
+import { Calendar } from "@/components/ui/calendar";
+import { TransactionApiRequest } from "@/api/api.types";
 
-type AddBudgetProps = {
+type EditTransactionProps = {
   title: string;
+  defaultValues: () => TransactionApiRequest & { transactionId: number };
+  open: boolean;
+  setOpen: (open: boolean) => void;
 };
 
-export function AddBudget({ title }: AddBudgetProps) {
-  const mutation = useBudgetMutation();
-  const ref = useRef<HTMLButtonElement>(null);
-  const form = useForm<z.infer<typeof budgetSchema>>({
-    resolver: zodResolver(budgetSchema),
-    defaultValues: {
-      isPercentage: 0,
-      value: 0,
-      name: "",
-      description: "",
-      categoryId: {
-        categoryId: 0,
-      },
-      reminderTypeId: 0,
-      enableReminder: 0,
-      paymentDate: "",
-      price: 0,
-    },
+export function EditTransaction({
+  title,
+  defaultValues,
+  open,
+  setOpen,
+}: EditTransactionProps) {
+  const mutation = useTransactionMutation();
+  const form = useForm<z.infer<typeof transactionSchema>>({
+    resolver: zodResolver(transactionSchema),
+    defaultValues: defaultValues(),
   });
 
-  async function onSubmit(values: z.infer<typeof budgetSchema>) {
-    mutation.mutate({ type: "Add", request: values });
+  async function onSubmit(values: z.infer<typeof transactionSchema>) {
+    mutation.mutate({ type: "Edit", request: values });
   }
 
   useEffect(() => {
-    mutation.isSuccess && ref?.current?.click();
+    mutation.isSuccess && setOpen(!open);
   }, [mutation.isSuccess]);
 
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button className="ml-auto px-2 py-0">
-          New <PlusCircle className="ml-2" />
-        </Button>
-      </DialogTrigger>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent
         className="sm:max-w-[425px]"
         onPointerDownOutside={(e) => e.preventDefault()}
@@ -93,6 +82,18 @@ export function AddBudget({ title }: AddBudgetProps) {
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="transactionId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input type="hidden" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="name"
@@ -121,19 +122,14 @@ export function AddBudget({ title }: AddBudgetProps) {
             />
             <FormField
               control={form.control}
-              name="categoryId.name"
+              name="categoryId"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Category</FormLabel>
                   <Select
                     onValueChange={(value) => {
-                      form.setValue(
-                        "categoryId.categoryId",
-                        CATEGORIES_IDS[value]
-                      );
-                      field.onChange(value);
+                      field.onChange(CATEGORIES_IDS[value]);
                     }}
-                    defaultValue={field.value}
                   >
                     <FormControl>
                       <SelectTrigger>
@@ -185,7 +181,10 @@ export function AddBudget({ title }: AddBudgetProps) {
               control={form.control}
               name="paymentDate"
               render={({ field }) => (
-                <FormItem className="flex flex-col">
+                <FormItem
+                  className="flex flex-col"
+                  defaultValue={format(field.value, "y-MM-dd")}
+                >
                   <FormLabel>Payment Date</FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>
@@ -247,9 +246,6 @@ export function AddBudget({ title }: AddBudgetProps) {
             <Button className="w-full" type="submit">
               Submit
             </Button>
-            <DialogClose asChild>
-              <Button ref={ref} className="hidden"></Button>
-            </DialogClose>
           </form>
         </Form>
       </DialogContent>

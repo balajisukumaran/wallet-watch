@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 
 import { ROUTES } from "@/routes/constants";
@@ -29,9 +29,14 @@ import { Input } from "@/components/ui/input";
 import { PhoneInput } from "@/components/ui/phone-input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { registerApi } from "@/api";
+import { useAuth } from "@/auth";
 
 export function Signup() {
+  const { setToken } = useAuth();
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState<boolean>(false);
+
   const form = useForm<z.infer<typeof signupSchema>>({
     resolver: zodResolver(signupSchema),
     defaultValues: {
@@ -44,8 +49,11 @@ export function Signup() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof signupSchema>) {
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof signupSchema>) {
+    const token = await registerApi(values);
+    if (!token) return;
+    setToken(token);
+    navigate(ROUTES.DASHBOARD);
   }
 
   return (

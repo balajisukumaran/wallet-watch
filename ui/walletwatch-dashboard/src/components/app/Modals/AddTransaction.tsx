@@ -7,7 +7,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { budgetSchema } from "@/lib/schema";
+import { transactionSchema } from "@/lib/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CalendarIcon, PlusCircle } from "lucide-react";
 import { useForm } from "react-hook-form";
@@ -20,6 +20,15 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { z } from "zod";
+import { DialogClose } from "@radix-ui/react-dialog";
+import { useEffect, useRef } from "react";
+import useTransactionMutation from "@/hooks/useTransactionMutation";
+import {
+  CATEGORIES,
+  CATEGORIES_IDS,
+  REMINDERS,
+  REMINDERS_IDS,
+} from "@/api/api.constants";
 import {
   Select,
   SelectContent,
@@ -28,48 +37,35 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  CATEGORIES,
-  CATEGORIES_IDS,
-  REMINDERS,
-  REMINDERS_IDS,
-} from "@/api/api.constants";
-import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
-import { cn } from "@/lib/utils";
 import { format } from "date-fns";
-import useBudgetMutation from "@/hooks/useBudgetMutation";
-import { useEffect, useRef } from "react";
-import { DialogClose } from "@radix-ui/react-dialog";
+import { cn } from "@/lib/utils";
+import { Calendar } from "@/components/ui/calendar";
 
-type AddBudgetProps = {
+type AddTransactionProps = {
   title: string;
 };
 
-export function AddBudget({ title }: AddBudgetProps) {
-  const mutation = useBudgetMutation();
+export function AddTransaction({ title }: AddTransactionProps) {
   const ref = useRef<HTMLButtonElement>(null);
-  const form = useForm<z.infer<typeof budgetSchema>>({
-    resolver: zodResolver(budgetSchema),
+  const mutation = useTransactionMutation();
+  const form = useForm<z.infer<typeof transactionSchema>>({
+    resolver: zodResolver(transactionSchema),
     defaultValues: {
-      isPercentage: 0,
-      value: 0,
       name: "",
       description: "",
-      categoryId: {
-        categoryId: 0,
-      },
-      reminderTypeId: 0,
-      enableReminder: 0,
+      categoryId: 1,
+      reminderTypeId: 1,
+      enableReminder: 1,
       paymentDate: "",
       price: 0,
     },
   });
 
-  async function onSubmit(values: z.infer<typeof budgetSchema>) {
+  async function onSubmit(values: z.infer<typeof transactionSchema>) {
     mutation.mutate({ type: "Add", request: values });
   }
 
@@ -121,19 +117,14 @@ export function AddBudget({ title }: AddBudgetProps) {
             />
             <FormField
               control={form.control}
-              name="categoryId.name"
+              name="categoryId"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Category</FormLabel>
                   <Select
                     onValueChange={(value) => {
-                      form.setValue(
-                        "categoryId.categoryId",
-                        CATEGORIES_IDS[value]
-                      );
-                      field.onChange(value);
+                      field.onChange(CATEGORIES_IDS[value]);
                     }}
-                    defaultValue={field.value}
                   >
                     <FormControl>
                       <SelectTrigger>

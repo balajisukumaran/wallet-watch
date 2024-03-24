@@ -1,11 +1,12 @@
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 
 import { ROUTES } from "@/routes/constants";
 import { loginSchema } from "@/lib/schema";
 
+import { useAuth } from "@/auth";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -28,8 +29,11 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
 import { Label } from "@/components/ui/label";
+import { loginApi } from "@/api";
 
 export function Login() {
+  const { setToken } = useAuth();
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
   const form = useForm<z.infer<typeof loginSchema>>({
@@ -40,8 +44,11 @@ export function Login() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof loginSchema>) {
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof loginSchema>) {
+    const token = await loginApi(values);
+    if (!token) return;
+    setToken(token);
+    navigate(ROUTES.DASHBOARD);
   }
 
   return (
