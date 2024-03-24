@@ -1,19 +1,23 @@
-FROM node:20-slim AS base
-ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
-RUN corepack enable
-COPY . /app
+# Use an official Node.js image
+FROM node:20-alpine
+
+# Set the working directory in the container
 WORKDIR /app
 
-FROM base AS prod-deps
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --frozen-lockfile
+# Install pnpm
+RUN npm install -g pnpm
 
-FROM base AS build
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
-RUN pnpm run build
+# Copy package.json and pnpm-lock.yaml for pnpm install
+COPY package.json pnpm-lock.yaml ./
 
-FROM base
-COPY --from=prod-deps /app/node_modules /app/node_modules
-COPY --from=build /app/dist /app/dist
+# Install dependencies using pnpm
+RUN pnpm install --frozen-lockfile
+
+# Copy the rest of the application source code
+COPY . .
+
+# Expose the port that the development server runs on
 EXPOSE 3000
-CMD [ "pnpm", "start" ]
+
+# Start the development server
+CMD ["pnpm", "run", "dev"]
