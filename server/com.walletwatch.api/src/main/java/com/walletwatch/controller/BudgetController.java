@@ -15,6 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/budget")
+@CrossOrigin(origins = "*")
 public class BudgetController {
 
     IBudgetService budgetService;
@@ -29,6 +30,7 @@ public class BudgetController {
     }
 
     @GetMapping("/get")
+    @CrossOrigin(origins = "*")
     public ResponseEntity<List<Budget>> getAllBudget(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) {
         UserDto userDto = userAuthenticationProvider.getUserByToken(authorizationHeader.split(" ")[1]);
 
@@ -38,6 +40,7 @@ public class BudgetController {
     }
 
     @PostMapping("/add")
+    @CrossOrigin(origins = "*")
     public ResponseEntity<Budget> AddBudget(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader, @RequestBody Budget budget) {
         UserDto userDto = userAuthenticationProvider.getUserByToken(authorizationHeader.split(" ")[1]);
         budget.setUser(new User());
@@ -46,6 +49,7 @@ public class BudgetController {
     }
 
     @PostMapping("/delete")
+    @CrossOrigin(origins = "*")
     public ResponseEntity<Budget> DeleteBudget(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader, @RequestBody Budget budget) {
         UserDto userDto = userAuthenticationProvider.getUserByToken(authorizationHeader.split(" ")[1]);
         budget.setUser(new User());

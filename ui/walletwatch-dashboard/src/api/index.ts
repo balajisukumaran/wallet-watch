@@ -214,7 +214,7 @@ const MOCK_TRANSACTIONS: TransactionApiResponse[] = [
 ];
 
 // Update the Base URL without a '/' at the end.
-export const BASE_URL = "http://localhost:6000/api";
+export const BASE_URL = "http://localhost:6001";
 
 // API URLs with the `${BASE_URL}/` suffix
 export const API_URLS = {

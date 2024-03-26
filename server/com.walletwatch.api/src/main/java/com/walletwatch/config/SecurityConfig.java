@@ -10,6 +10,11 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import java.util.*;
+import org.springframework.security.config.annotation.web.configurers.CorsConfigurer;
 
 /**
  * security config class
@@ -33,6 +38,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.exceptionHandling(customizer -> customizer
                         .authenticationEntryPoint(userAuthenticationEntryPoint))
+                .cors(CorsConfigurer<HttpSecurity>::and)
                 .addFilterBefore(new JwtAuthFilter(userAuthenticationProvider),
                         BasicAuthenticationFilter.class)
                 .csrf(AbstractHttpConfigurer::disable)
@@ -46,5 +52,17 @@ public class SecurityConfig {
                         .anyRequest().authenticated());
 
         return http.build();
+    }
+    // Optionally define the CORS configuration bean
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(List.of("*")); // Or use `List.of("*")` for allowing all origins
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
+        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowCredentials(false); // If needed
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 }

@@ -11,6 +11,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
+import software.amazon.awssdk.core.SdkBytes;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.textract.TextractClient;
+import software.amazon.awssdk.services.textract.model.*;
+
+import java.io.IOException;
 import java.util.*;
 
 @RestController
@@ -66,4 +74,55 @@ public class TransactionController {
         }
         return ResponseEntity.ok(transaction);
     }
+
+    @PostMapping("/upload")
+    public ResponseEntity<Transaction> UploadTransaction(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader, @RequestParam("file") MultipartFile file) throws IOException {
+        Region region = Region.US_EAST_1; // Specify the AWS region
+        TextractClient textractClient = TextractClient.builder()
+                .region(region)
+                .credentialsProvider(DefaultCredentialsProvider.create())
+                .build();
+
+        // Convert MultipartFile to SdkBytes
+        SdkBytes documentBytes = SdkBytes.fromInputStream(file.getInputStream());
+
+        // Prepare the request
+        Document document = Document.builder()
+                .bytes(documentBytes)
+                .build();
+        AnalyzeDocumentRequest request = AnalyzeDocumentRequest.builder()
+                .document(document)
+                .featureTypes(FeatureType.FORMS, FeatureType.TABLES) // Specify the features you want
+                .build();
+
+        // Call AWS Textract
+        AnalyzeDocumentResponse response = textractClient.analyzeDocument(request);
+        Float Total=0f;
+        for(int i=0;i<response.blocks().size();i++){
+            String line = response.blocks().get(i).text();
+
+            if( line!= null && line.contains("TOTAL") && !line.contains("SUBTOTAL"))
+            {
+                String s=response.blocks().get(i+1).text();
+                Total = Float.parseFloat(s);
+                break;
+            }
+        }
+
+        TransactionDto transactionDto = new TransactionDto();
+        transactionDto.name("");
+
+                String name;
+        String description;
+        int categoryId;
+        int reminderTypeId;
+        int enableReminder;
+        Date paymentDate;
+        float price;
+
+        textractClient.close();
+
+        return null;
+    }
+
 }

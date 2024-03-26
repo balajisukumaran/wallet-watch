@@ -4,17 +4,23 @@ import com.walletwatch.businessservices.interfaces.IEmailService;
 import com.walletwatch.businessservices.interfaces.IUserService;
 import com.walletwatch.config.UserAuthenticationProvider;
 import com.walletwatch.dtos.*;
+import jakarta.servlet.http.HttpServletRequestWrapper;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.cors.CorsConfigurationSource;
 
 import java.net.URI;
 import java.util.UUID;
 
+import org.springframework.web.cors.CorsConfiguration;
+import java.util.*;
 @RestController
+@CrossOrigin(origins = "*")
 public class AuthController {
 
     private final IUserService userService;
@@ -41,6 +47,7 @@ public class AuthController {
      * @return ok status for user dto for response entity
      */
     @PostMapping("/login")
+    @CrossOrigin(origins = "*")
     public ResponseEntity<UserDto> login(@RequestBody @Valid CredentialsDto credentialsDto) {
         UserDto userDto = userService.login(credentialsDto);
         userDto.setPassword(userAuthenticationProvider.createToken(userDto));
@@ -54,6 +61,7 @@ public class AuthController {
      * @return response entity created for suer
      */
     @PostMapping("/register")
+    @CrossOrigin(origins = "*")
     public ResponseEntity<UserDto> register(@RequestBody @Valid SignUpDto user) {
         UserDto createdUser = userService.register(user);
 
@@ -69,6 +77,7 @@ public class AuthController {
      * @return ok in response in user auth
      */
     @PostMapping("/get/user")
+    @CrossOrigin(origins = "*")
     public ResponseEntity<UserDto> userByToken(@RequestBody @Valid JWTDto jwtDto) {
         return ResponseEntity.ok(userAuthenticationProvider.getUserByToken(jwtDto.JWT()));
     }
@@ -80,6 +89,7 @@ public class AuthController {
      * @return error or ok in response in Alert DTO
      */
     @PostMapping("/reset")
+    @CrossOrigin(origins = "*")
     public ResponseEntity<AlertDto> reset(@RequestBody @Valid ResetDto resetDto) {
         UserDto user = userService.findByEmail(resetDto.getFlag());
 
@@ -106,6 +116,7 @@ public class AuthController {
         return ResponseEntity.ok(failedDto);
     }
 
+
     private SimpleMailMessage getSimpleMailMessage(UserDto user) {
         SimpleMailMessage passwordResetEmail = new SimpleMailMessage();
         passwordResetEmail.setFrom(systemEmail);
@@ -125,6 +136,7 @@ public class AuthController {
      * @return user re register
      */
     @PostMapping("/new-password")
+    @CrossOrigin(origins = "*")
     public ResponseEntity<AlertDto> resetPassword(@RequestBody @Valid NewPasswordDto newPasswordDto) {
 
         // Find the user associated with the reset token
@@ -151,8 +163,12 @@ public class AuthController {
         return ResponseEntity.ok(new AlertDto("Error", "Invalid reset token."));
     }
 
+    @Autowired
+    private CorsConfigurationSource corsConfigurationSource;
     @GetMapping("/check")
-    public String check(){
-        return "Authentication Successful";
+    @CrossOrigin(origins = "*")
+    public List<String> check(){
+        CorsConfiguration configuration = corsConfigurationSource.getCorsConfiguration(new HttpServletRequestWrapper(new MockHttpServletRequest()));
+        return configuration.getAllowedOrigins();
     }
 }

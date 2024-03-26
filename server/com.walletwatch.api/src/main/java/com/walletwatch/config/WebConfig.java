@@ -22,8 +22,8 @@ import java.util.*;
 /**
  * web config class
  */
-@Configuration
-@EnableWebMvc
+//@Configuration
+//@EnableWebMvc
 public class WebConfig {
 
     /**
@@ -58,7 +58,6 @@ public class WebConfig {
                 , HttpMethod.DELETE.name());
 
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowCredentials(true);
 
         config.addAllowedOrigin("*");
         config.setAllowedHeaders(allowedHeaders);
