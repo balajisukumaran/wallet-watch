@@ -48,6 +48,7 @@ export function Login() {
     const token = await loginApi(values);
     if (!token) return;
     setToken(token);
+    localStorage.setItem("logged_token", token);
     navigate(ROUTES.DASHBOARD);
   }
 

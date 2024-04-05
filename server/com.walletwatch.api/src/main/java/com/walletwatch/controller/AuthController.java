@@ -21,6 +21,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import java.util.*;
 @RestController
 @CrossOrigin(origins = "*")
+@RequestMapping("/api")
 public class AuthController {
 
     private final IUserService userService;

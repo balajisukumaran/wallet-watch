@@ -7,6 +7,7 @@ import com.walletwatch.controller.transformer.DtoToEntity;
 import com.walletwatch.dtos.TransactionDto;
 import com.walletwatch.dtos.UserDto;
 import com.walletwatch.entities.Transaction;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -66,10 +67,9 @@ public class TransactionController {
         UserDto userDto = userAuthenticationProvider.getUserByToken(authorizationHeader.split(" ")[1]);
         transactionDto.setUserId(userDto.getUserId());
         Transaction transaction = DtoToEntity.ToEntity(transactionDto);
-        try{
+        try {
             transactionService.deleteTransaction(transaction);
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             return null;
         }
         return ResponseEntity.ok(transaction);
@@ -97,32 +97,35 @@ public class TransactionController {
 
         // Call AWS Textract
         AnalyzeDocumentResponse response = textractClient.analyzeDocument(request);
-        Float Total=0f;
-        for(int i=0;i<response.blocks().size();i++){
+        Float Total = 0f;
+        StringBuilder Name = new StringBuilder();
+        for (int i = 0; i < response.blocks().size(); i++) {
             String line = response.blocks().get(i).text();
 
-            if( line!= null && line.contains("TOTAL") && !line.contains("SUBTOTAL"))
-            {
-                String s=response.blocks().get(i+1).text();
+            if(i<3){
+                Name.append(line).append(" ");
+            }
+            else if (line != null && line.contains("TOTAL") && !line.contains("SUBTOTAL")) {
+                String s = response.blocks().get(i + 1).text();
                 Total = Float.parseFloat(s);
                 break;
             }
         }
-
-        TransactionDto transactionDto = new TransactionDto();
-        transactionDto.name("");
-
-                String name;
-        String description;
-        int categoryId;
-        int reminderTypeId;
-        int enableReminder;
-        Date paymentDate;
-        float price;
-
         textractClient.close();
 
-        return null;
+        TransactionDto transactionDto = new TransactionDto();
+        transactionDto.setName(String.valueOf(Name).replace("null","").trim());
+        transactionDto.setPrice(Total);
+
+        UserDto userDto = userAuthenticationProvider.getUserByToken(authorizationHeader.split(" ")[1]);
+        transactionDto.setUserId(userDto.getUserId());
+        transactionDto.setCategoryId(4);
+        transactionDto.setReminderTypeId(1);
+        transactionDto.setDescription("Shopping");
+        transactionDto.setPaymentDate(DateTime.now().toDate());
+
+        Transaction transaction = DtoToEntity.ToEntity(transactionDto);
+        return ResponseEntity.ok(transactionService.addTransaction(transaction));
     }
 
 }

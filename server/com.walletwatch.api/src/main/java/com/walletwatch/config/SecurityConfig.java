@@ -45,9 +45,9 @@ public class SecurityConfig {
                 .sessionManagement(customizer -> customizer.sessionCreationPolicy(
                         SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers(HttpMethod.POST, "/login",
-                                "/register", "/get/user",
-                                "/reset", "/new-password")
+                        .requestMatchers(HttpMethod.POST, "/api/login",
+                                "/api/register", "/api/get/user",
+                                "/api/reset", "/api/new-password")
                         .permitAll()
                         .anyRequest().authenticated());
 

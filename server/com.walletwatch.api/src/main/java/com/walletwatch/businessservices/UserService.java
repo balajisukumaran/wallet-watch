@@ -70,10 +70,10 @@ public class UserService implements IUserService {
      */
     @Override
     public UserDto login(CredentialsDto credentialsDto) {
-        Optional<User> userFound = userDAO.findBy(credentialsDto.login(), IdentifyBy.Login);
+        Optional<User> userFound = userDAO.findBy(credentialsDto.userName(), IdentifyBy.Login);
 
         if(userFound == null || !userFound.isPresent())
-            userFound = userDAO.findBy(credentialsDto.login(), IdentifyBy.Email);
+            userFound = userDAO.findBy(credentialsDto.userName(), IdentifyBy.Email);
 
         if (userFound != null && userFound.isPresent()) {
             User user = userFound.get();

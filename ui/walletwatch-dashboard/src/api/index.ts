@@ -214,7 +214,7 @@ const MOCK_TRANSACTIONS: TransactionApiResponse[] = [
 ];
 
 // Update the Base URL without a '/' at the end.
-export const BASE_URL = "http://localhost:6001";
+export const BASE_URL = "http://localhost:6001/api";
 
 // API URLs with the `${BASE_URL}/` suffix
 export const API_URLS = {
@@ -244,12 +244,13 @@ export const loginApi = async (request: LoginApiRequest) => {
   } catch (err) {
     console.error(err);
     toast({ description: ERROR_MESSAGES.LOGIN_FAILURE });
-  } finally {
-    //! Remove this after API Integration
-    return MOCK_PASSWORD;
-
-    // return;
   }
+  //  finally {
+  //   //! Remove this after API Integration
+  //   return MOCK_PASSWORD;
+
+  //   // return;
+  // }
 };
 
 export const registerApi = async (request: RegisterApiRequest) => {
@@ -264,16 +265,19 @@ export const registerApi = async (request: RegisterApiRequest) => {
   } catch (err) {
     console.error(err);
     toast({ description: ERROR_MESSAGES.REGISTER_FAILURE });
-  } finally {
-    //! Remove this after API Integration
-    return MOCK_PASSWORD;
-
-    // return;
   }
+  // finally {
+  //   //! Remove this after API Integration
+  //   return MOCK_PASSWORD;
+
+  //   // return;
+  // }
 };
 
 export const getBudgetsApi = async (): Promise<BudgetApiResponse[]> => {
   try {
+    axios.defaults.headers.common["Authorization"] =
+      "Bearer " + localStorage.getItem("logged_token");
     const response: AxiosResponse<BudgetApiResponse[]> = await axios.get(
       API_URLS.GET_BUDGETS
     );
@@ -282,14 +286,19 @@ export const getBudgetsApi = async (): Promise<BudgetApiResponse[]> => {
   } catch (err) {
     console.error(err);
     toast({ description: ERROR_MESSAGES.BUDGET_GET_FAILURE });
-  } finally {
-    //! Remove finally block after API integration
     return MOCK_BUDGETS;
   }
+  // finally {
+  //   //! Remove finally block after API integration
+  //   return MOCK_BUDGETS;
+  // }
 };
 
 export const addBudgetApi = async (request: BudgetApiRequest) => {
   try {
+    axios.defaults.headers.common["Authorization"] =
+      "Bearer " + localStorage.getItem("logged_token");
+
     const response: AxiosResponse<BudgetApiResponse> = await axios.post(
       API_URLS.ADD_BUDGET,
       request
@@ -300,14 +309,18 @@ export const addBudgetApi = async (request: BudgetApiRequest) => {
   } catch (err) {
     console.error(err);
     toast({ description: ERROR_MESSAGES.BUDGET_ADD_FAILURE });
-  } finally {
-    //! Remove finally block after API integration
-    return MOCK_BUDGETS[0];
   }
+  // finally {
+  //   //! Remove finally block after API integration
+  //   return MOCK_BUDGETS[0];
+  // }
 };
 
 export const deleteBudgetApi = async (request: BudgetApiResponse) => {
   try {
+    axios.defaults.headers.common["Authorization"] =
+      "Bearer " + localStorage.getItem("logged_token");
+
     const response: AxiosResponse<BudgetApiResponse> = await axios.post(
       API_URLS.DELETE_BUDGET,
       request
@@ -318,14 +331,19 @@ export const deleteBudgetApi = async (request: BudgetApiResponse) => {
   } catch (err) {
     console.error(err);
     toast({ description: ERROR_MESSAGES.BUDGET_DELETE_FAILURE });
-  } finally {
-    //! Remove finally block after API integration
     return MOCK_BUDGETS[0];
   }
+  // finally {
+  //   //! Remove finally block after API integration
+  //   return MOCK_BUDGETS[0];
+  // }
 };
 
 export const getIncomesApi = async (): Promise<IncomeApiResponse[]> => {
   try {
+    axios.defaults.headers.common["Authorization"] =
+      "Bearer " + localStorage.getItem("logged_token");
+
     const response: AxiosResponse<IncomeApiResponse[]> = await axios.get(
       API_URLS.GET_INCOMES
     );
@@ -334,14 +352,19 @@ export const getIncomesApi = async (): Promise<IncomeApiResponse[]> => {
   } catch (err) {
     console.error(err);
     toast({ description: ERROR_MESSAGES.INCOME_GET_FAILURE });
-  } finally {
-    //! Remove finally block after API integration
     return MOCK_INCOMES;
   }
+  // finally {
+  //   //! Remove finally block after API integration
+  //   return MOCK_INCOMES;
+  // }
 };
 
 export const addIncomeApi = async (request: IncomeApiRequest) => {
   try {
+    axios.defaults.headers.common["Authorization"] =
+      "Bearer " + localStorage.getItem("logged_token");
+
     const response: AxiosResponse<IncomeApiResponse> = await axios.post(
       API_URLS.ADD_INCOME,
       request
@@ -352,14 +375,19 @@ export const addIncomeApi = async (request: IncomeApiRequest) => {
   } catch (err) {
     console.error(err);
     toast({ description: ERROR_MESSAGES.INCOME_ADD_FAILURE });
-  } finally {
-    //! Remove finally block after API integration
     return MOCK_INCOMES[0];
   }
+  // finally {
+  //   //! Remove finally block after API integration
+  //   return MOCK_INCOMES[0];
+  // }
 };
 
 export const deleteIncomeApi = async (request: IncomeApiResponse) => {
   try {
+    axios.defaults.headers.common["Authorization"] =
+      "Bearer " + localStorage.getItem("logged_token");
+
     const response: AxiosResponse<IncomeApiResponse> = await axios.post(
       API_URLS.DELETE_INCOME,
       request
@@ -370,16 +398,21 @@ export const deleteIncomeApi = async (request: IncomeApiResponse) => {
   } catch (err) {
     console.error(err);
     toast({ description: ERROR_MESSAGES.INCOME_DELETE_FAILURE });
-  } finally {
-    //! Remove finally block after API integration
     return MOCK_INCOMES[0];
   }
+  // finally {
+  //   //! Remove finally block after API integration
+  //   return MOCK_INCOMES[0];
+  // }
 };
 
 export const getTransactionsApi = async (): Promise<
   TransactionApiResponse[]
 > => {
   try {
+    axios.defaults.headers.common["Authorization"] =
+      "Bearer " + localStorage.getItem("logged_token");
+
     const response: AxiosResponse<TransactionApiResponse[]> = await axios.get(
       API_URLS.GET_TRANSACTIONS
     );
@@ -388,14 +421,19 @@ export const getTransactionsApi = async (): Promise<
   } catch (err) {
     console.error(err);
     toast({ description: ERROR_MESSAGES.TRANSACTION_GET_FAILURE });
-  } finally {
-    //! Remove finally block after API integration
     return MOCK_TRANSACTIONS;
   }
+  // finally {
+  //   //! Remove finally block after API integration
+  //   return MOCK_TRANSACTIONS;
+  // }
 };
 
 export const addTransactionApi = async (request: TransactionApiRequest) => {
   try {
+    axios.defaults.headers.common["Authorization"] =
+      "Bearer " + localStorage.getItem("logged_token");
+
     const response: AxiosResponse<TransactionApiResponse> = await axios.post(
       API_URLS.ADD_TRANSACTION,
       request
@@ -406,14 +444,19 @@ export const addTransactionApi = async (request: TransactionApiRequest) => {
   } catch (err) {
     console.error(err);
     toast({ description: ERROR_MESSAGES.TRANSACTION_ADD_FAILURE });
-  } finally {
-    //! Remove finally block after API integration
     return MOCK_TRANSACTIONS[0];
   }
+  // finally {
+  //   //! Remove finally block after API integration
+  //   return MOCK_TRANSACTIONS[0];
+  // }
 };
 
 export const editTransactionApi = async (request: TransactionApiRequest) => {
   try {
+    axios.defaults.headers.common["Authorization"] =
+      "Bearer " + localStorage.getItem("logged_token");
+
     const response: AxiosResponse<TransactionApiResponse> = await axios.post(
       API_URLS.EDIT_TRANSACTION,
       request
@@ -424,14 +467,19 @@ export const editTransactionApi = async (request: TransactionApiRequest) => {
   } catch (err) {
     console.error(err);
     toast({ description: ERROR_MESSAGES.TRANSACTION_EDIT_FAILURE });
-  } finally {
-    //! Remove finally block after API integration
     return MOCK_TRANSACTIONS[0];
   }
+  // finally {
+  //   //! Remove finally block after API integration
+  //   return MOCK_TRANSACTIONS[0];
+  // }
 };
 
 export const deleteTransactionApi = async (request: TransactionApiResponse) => {
   try {
+    axios.defaults.headers.common["Authorization"] =
+      "Bearer " + localStorage.getItem("logged_token");
+
     const response: AxiosResponse<TransactionApiResponse> = await axios.post(
       API_URLS.DELETE_TRANSACTION,
       request
@@ -442,8 +490,10 @@ export const deleteTransactionApi = async (request: TransactionApiResponse) => {
   } catch (err) {
     console.error(err);
     toast({ description: ERROR_MESSAGES.TRANSACTION_DELETE_FAILURE });
-  } finally {
-    //! Remove finally block after API integration
     return MOCK_TRANSACTIONS[0];
   }
+  // finally {
+  //   //! Remove finally block after API integration
+  //   return MOCK_TRANSACTIONS[0];
+  // }
 };

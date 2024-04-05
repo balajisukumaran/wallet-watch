@@ -10,7 +10,7 @@ export interface User {
 export type RegisterApiRequest = Partial<User>;
 
 export type LoginApiRequest = {
-  login: string;
+  userName: string;
   password: string;
 };
 
