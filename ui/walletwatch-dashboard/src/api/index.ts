@@ -214,12 +214,14 @@ const MOCK_TRANSACTIONS: TransactionApiResponse[] = [
 ];
 
 // Update the Base URL without a '/' at the end.
-export const BASE_URL = "http://localhost:6001/api";
+export const BASE_URL = "http://container1:6001/api";
 
 // API URLs with the `${BASE_URL}/` suffix
 export const API_URLS = {
   LOGIN: `${BASE_URL}/login`,
   REGISTER: `${BASE_URL}/register`,
+  IMAGE_UPLOAD: `${BASE_URL}/image/upload`,
+  IMAGE_DOWNLOAD: `${BASE_URL}/image/download`,
   GET_BUDGETS: `${BASE_URL}/budget/get`,
   ADD_BUDGET: `${BASE_URL}/budget/add`,
   DELETE_BUDGET: `${BASE_URL}/budget/delete`,
@@ -230,10 +232,12 @@ export const API_URLS = {
   ADD_TRANSACTION: `${BASE_URL}/transaction/add`,
   EDIT_TRANSACTION: `${BASE_URL}/transaction/edit`,
   DELETE_TRANSACTION: `${BASE_URL}/transaction/delete`,
+  UPLOAD_TRANSACTION: `${BASE_URL}/transaction/upload`,
 };
 
 export const loginApi = async (request: LoginApiRequest) => {
   try {
+    if (request.userName) localStorage.setItem("userName", request.userName);
     const response: AxiosResponse<UserApiResponse> = await axios.post(
       API_URLS.LOGIN,
       request
@@ -243,6 +247,7 @@ export const loginApi = async (request: LoginApiRequest) => {
     throw new Error(ERROR_MESSAGES.LOGIN_FAILURE);
   } catch (err) {
     console.error(err);
+    localStorage.removeItem("userName");
     toast({ description: ERROR_MESSAGES.LOGIN_FAILURE });
   }
   //  finally {
@@ -255,6 +260,7 @@ export const loginApi = async (request: LoginApiRequest) => {
 
 export const registerApi = async (request: RegisterApiRequest) => {
   try {
+    if (request.userName) localStorage.setItem("userName", request.userName);
     const response: AxiosResponse<UserApiResponse> = await axios.post(
       API_URLS.REGISTER,
       request
@@ -264,6 +270,7 @@ export const registerApi = async (request: RegisterApiRequest) => {
     throw new Error(ERROR_MESSAGES.REGISTER_FAILURE);
   } catch (err) {
     console.error(err);
+    localStorage.removeItem("userName");
     toast({ description: ERROR_MESSAGES.REGISTER_FAILURE });
   }
   // finally {
@@ -496,4 +503,26 @@ export const deleteTransactionApi = async (request: TransactionApiResponse) => {
   //   //! Remove finally block after API integration
   //   return MOCK_TRANSACTIONS[0];
   // }
+};
+export const uploadTransactionApi = async (formData: FormData) => {
+  try {
+    axios.defaults.headers.common["Authorization"] =
+      "Bearer " + localStorage.getItem("logged_token");
+
+    const response: AxiosResponse<any> = await axios.post(
+      API_URLS.UPLOAD_TRANSACTION,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+    if (response.status === 200)
+      toast({ description: ERROR_MESSAGES.TRANSACTION_UPLOAD });
+    throw new Error(ERROR_MESSAGES.TRANSACTION_UPLOAD_FAILURE);
+  } catch (err) {
+    console.error(err);
+    toast({ description: ERROR_MESSAGES.TRANSACTION_UPLOAD_FAILURE });
+  }
 };

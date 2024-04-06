@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { BadgeDollarSign, Receipt, Wallet } from "lucide-react";
 
@@ -9,14 +10,18 @@ import { Card, CardContent, CardFooter, CardHeader } from "../ui/card";
 const SideBar = () => {
   const location = useLocation();
   const currentPage = location.pathname.split("/").pop() || "";
+  const userName: string | null = useMemo(
+    () => localStorage.getItem("userName"),
+    []
+  );
 
   return (
     <Card className="border-none bg-transparent h-full w-full md:max-w-52 flex flex-col justify-between">
       <CardHeader className="flex flex-col gap-4 items-center">
         <Avatar className="w-24 h-24">
-          <AvatarFallback>CR</AvatarFallback>
+          {userName && <AvatarFallback>{userName.slice(0, 3)}</AvatarFallback>}
         </Avatar>
-        <h3 className="w-full px-4 text-center">Balaj CR</h3>{" "}
+        {userName && <h3 className="w-full px-4 text-center">{userName}</h3>}
         {/** Todo: Read from state */}
       </CardHeader>
       <CardContent>

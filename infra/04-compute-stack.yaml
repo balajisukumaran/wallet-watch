@@ -1,16 +1,10 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: CloudFormation template for deploying an EC2 instance and a Java Lambda function in a public subnet.
+Description: CloudFormation template for deploying an EC2 instance.
 
 Parameters:
   KeyName:
     Description: SSH key name for accessing the EC2 instance.
     Type: AWS::EC2::KeyPair::KeyName
-  JavaLambdaS3Bucket:
-    Description: Name of the S3 bucket where the Java Lambda function .jar is stored.
-    Type: String
-  JavaLambdaS3Key:
-    Description: S3 key (file name) of the Java Lambda function .jar.
-    Type: String
 
 Resources:
   SecretsManagerAccessRole:
@@ -49,51 +43,3 @@ Resources:
       SecurityGroupIds:
         - !ImportValue "NETWORK-STACK-EC2SecurityGroupId"
       SubnetId: !ImportValue "NETWORK-STACK-PublicSubnetId"
-
-  LambdaExecutionRole:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Effect: "Allow"
-            Principal:
-              Service: "lambda.amazonaws.com"
-            Action: "sts:AssumeRole"
-      Policies:
-        - PolicyName: "LambdaExecutionPolicy"
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              - Effect: "Allow"
-                Action:
-                  - "logs:CreateLogGroup"
-                  - "logs:CreateLogStream"
-                  - "logs:PutLogEvents"
-                Resource: !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:*"
-              - Effect: "Allow"
-                Action: "s3:GetObject"
-                Resource: !Sub "arn:aws:s3:::${JavaLambdaS3Bucket}/${JavaLambdaS3Key}"
-              - Effect: "Allow"
-                Action:
-                  - "ec2:CreateNetworkInterface"
-                  - "ec2:DescribeNetworkInterfaces"
-                  - "ec2:DeleteNetworkInterface"
-                Resource: "*"
-
-  WalletWatchLambda:
-    Type: AWS::Lambda::Function
-    Properties:
-      Code:
-        S3Bucket: !Ref JavaLambdaS3Bucket
-        S3Key: !Ref JavaLambdaS3Key
-      Handler: com.example.TempHandler
-      Role: !GetAtt "LambdaExecutionRole.Arn"
-      Runtime: java11
-      Timeout: 30
-      MemorySize: 512
-      VpcConfig:
-        SubnetIds:
-          - !ImportValue "NETWORK-STACK-PublicSubnetId"
-        SecurityGroupIds:
-          - !ImportValue "NETWORK-STACK-EC2SecurityGroupId"

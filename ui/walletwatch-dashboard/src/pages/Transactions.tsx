@@ -15,6 +15,7 @@ const Transactions = () => {
           data={query.data}
           columns={transactionColumns}
           modal="Transaction"
+          refetch={query.refetch}
         />
       )}
     </section>

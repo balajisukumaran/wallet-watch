@@ -12,6 +12,8 @@ export const ERROR_MESSAGES = {
   BUDGET_EDIT: "Budget modified successfully!",
   INCOME_EDIT: "Income modified successfully!",
   TRANSACTION_EDIT: "Transaction modified successfully!",
+  TRANSACTION_UPLOAD: "Transaction uploaded successfully!",
+  TRANSACTION_UPLOAD_FAILURE: "Transaction upload failed!",
   BUDGET_GET_FAILURE:
     "Unable to fetch Budgets. Please try again after sometime.",
   INCOME_GET_FAILURE:

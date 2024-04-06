@@ -34,9 +34,10 @@ export type DataTableProps = {
   data: any[];
   columns: ColumnDef<any, any>[];
   modal: "Budget" | "Income" | "Transaction";
+  refetch?: () => Promise<any>;
 };
 
-export function DataTable({ data, columns, modal }: DataTableProps) {
+export function DataTable({ data, columns, modal, refetch }: DataTableProps) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
@@ -71,7 +72,7 @@ export function DataTable({ data, columns, modal }: DataTableProps) {
 
   return (
     <div className="w-full">
-      <div className="flex items-center py-4">
+      <div className="flex items-center justify-between py-4">
         <DebouncedInput
           className="max-w-sm mr-4"
           placeholder="Filter budgets..."
@@ -83,7 +84,7 @@ export function DataTable({ data, columns, modal }: DataTableProps) {
         ) : modal === "Income" ? (
           <AddIncome title="Add Income" />
         ) : modal === "Transaction" ? (
-          <AddTransaction title="Add Transaction" />
+          <AddTransaction title="Add Transaction" refetch={refetch} />
         ) : (
           <Button className="ml-auto px-2 py-0">
             New <PlusCircle className="ml-2" />

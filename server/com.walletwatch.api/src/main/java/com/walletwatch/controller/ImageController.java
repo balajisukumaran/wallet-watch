@@ -2,9 +2,7 @@ package com.walletwatch.controller;
 
 import com.walletwatch.config.UserAuthenticationProvider;
 import com.walletwatch.dtos.UserDto;
-import com.walletwatch.entities.Budget;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -20,10 +18,8 @@ import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 
 import java.io.IOException;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/image")
@@ -31,7 +27,6 @@ public class ImageController {
 
     private final UserAuthenticationProvider userAuthenticationProvider;
     private final S3Client s3Client;
-
     private final String bucketName = "wallet-watch-blob-storage-590183799919-us-east-1";
 
     @Autowired

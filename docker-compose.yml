@@ -4,7 +4,7 @@ services:
     volumes:
       - .:/usr/src/api
     ports:
-      - 6000:6000
+      - 6001:6001
     networks:
       - docker-assignment-network
 
@@ -13,7 +13,7 @@ services:
     volumes:
       - .:/usr/src/ui
     ports:
-      - 3000:3000
+      - 3000:80
     networks:
       - docker-assignment-network
 

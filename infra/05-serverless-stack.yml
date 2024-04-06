@@ -1,0 +1,61 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: CloudFormation template for deploying a Java Lambda function with access to Secrets Manager and SES.
+
+Parameters:
+  JavaLambdaS3Bucket:
+    Description: Name of the S3 bucket where the Java Lambda function .jar is stored.
+    Type: String
+  JavaLambdaS3Key:
+    Description: S3 key (file name) of the Java Lambda function .jar.
+    Type: String
+  SesIdentityArn:
+    Description: ARN of the SES identity (email or domain) that the Lambda function will use to send emails.
+    Type: String
+
+Resources:
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service: "lambda.amazonaws.com"
+            Action: "sts:AssumeRole"
+      Policies:
+        - PolicyName: "LambdaExecutionPolicy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action:
+                  - "logs:CreateLogGroup"
+                  - "logs:CreateLogStream"
+                  - "logs:PutLogEvents"
+                Resource: !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:*"
+              - Effect: "Allow"
+                Action: "s3:GetObject"
+                Resource: !Sub "arn:aws:s3:::${JavaLambdaS3Bucket}/${JavaLambdaS3Key}"
+              - Effect: "Allow" # Adding permission for Secrets Manager
+                Action:
+                  - "secretsmanager:GetSecretValue"
+                Resource: !ImportValue "SECRET-STACK-SecretArn" # This should match the ARN of the secret
+              - Effect: "Allow" # Grant permission to send emails using SES
+                Action:
+                  - "ses:SendEmail"
+                  - "ses:SendRawEmail"
+                Resource: "*"
+
+  WalletWatchLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        S3Bucket: !Ref JavaLambdaS3Bucket
+        S3Key: !Ref JavaLambdaS3Key
+      Handler: org.walletwatch.WalletWatchAlertHandler::handleRequest
+      Role: !GetAtt "LambdaExecutionRole.Arn"
+      Runtime: java17
+      Timeout: 30
+      MemorySize: 512
+      # Removed VpcConfig to allow Lambda to access AWS services without VPC restrictions

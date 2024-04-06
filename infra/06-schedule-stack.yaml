@@ -1,0 +1,31 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "CloudFormation template to create an EventBridge rule to trigger a Lambda function every hour."
+
+Parameters:
+  LambdaArn:
+    Description: "ARN of the Lambda function to be triggered."
+    Type: String
+
+Resources:
+  ScheduledRule:
+    Type: "AWS::Events::Rule"
+    Properties:
+      Description: "Trigger Lambda every hour"
+      ScheduleExpression: "rate(5 minutes)" #"cron(0 * * * ? *)"
+      State: "ENABLED"
+      Targets:
+        - Arn: !Ref LambdaArn
+          Id: "TargetFunctionV1"
+
+  PermissionForEventsToInvokeLambda:
+    Type: "AWS::Lambda::Permission"
+    Properties:
+      FunctionName: !Ref LambdaArn
+      Action: "lambda:InvokeFunction"
+      Principal: "events.amazonaws.com"
+      SourceArn: !GetAtt ScheduledRule.Arn
+
+Outputs:
+  ScheduledRuleArn:
+    Description: "ARN of the Scheduled EventBridge Rule"
+    Value: !GetAtt ScheduledRule.Arn

@@ -29,7 +29,7 @@ public class WalletWatchAlertHandler implements RequestHandler<Map<String, Strin
             ObjectMapper objectMapper = new ObjectMapper();
 
             // Retrieve the secret from AWS Secrets Manager
-            AWSSecretsManager client = AWSSecretsManagerClientBuilder.standard()
+            AWSSecretsManager client  = AWSSecretsManagerClientBuilder.standard()
                     .withRegion(region)
                     .build();
             GetSecretValueRequest getSecretValueRequest = new GetSecretValueRequest()
@@ -82,11 +82,10 @@ public class WalletWatchAlertHandler implements RequestHandler<Map<String, Strin
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-
             HashMap<String, List<MessageBody>> messageBodies = AlertService.parseBody(alerts);
             EmailService.sendEmail(messageBodies);
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
 
         return null;
