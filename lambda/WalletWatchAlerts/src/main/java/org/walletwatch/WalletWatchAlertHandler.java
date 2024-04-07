@@ -17,10 +17,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class WalletWatchAlertHandler implements RequestHandler<Map<String, String>, Map<String, Object>> {
+public class WalletWatchAlertHandler implements RequestHandler<Map<String, Object>, Map<String, Object>> {
 
     @Override
-    public Map<String, Object> handleRequest(Map<String, String> event, Context context) {
+    public Map<String, Object> handleRequest(Map<String, Object> event, Context context) {
         try {
 
             String secretName = "WalletWatchSecret";
