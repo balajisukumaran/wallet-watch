@@ -10,19 +10,19 @@ build_ui:
   script:
     - cd ui/walletwatch-dashboard
     - echo $PATH
-    - DOCKER_BUILDKIT=1 docker build -t wallet-watch:ui .
-    - docker tag wallet-watch:ui $DOCKERHUB_USERNAME/wallet-watch:ui
-    - echo "$DOCKERHUB_PASSWORD" | docker login -u $DOCKERHUB_USERNAME --password-stdin
-    - docker push $DOCKERHUB_USERNAME/wallet-watch:ui
+    - DOCKER_BUILDKIT=1 sudo docker build -t wallet-watch:ui .
+    - sudo docker tag wallet-watch:ui $DOCKERHUB_USERNAME/wallet-watch:ui
+    - echo "$DOCKERHUB_PASSWORD" | sudo docker login -u $DOCKERHUB_USERNAME --password-stdin
+    - sudo docker push $DOCKERHUB_USERNAME/wallet-watch:ui
 
 build_server:
   stage: build
   script:
     - cd server/com.walletwatch.api
-    - docker build -t wallet-watch:server .
-    - docker tag wallet-watch:server $DOCKERHUB_USERNAME/wallet-watch:server
-    - echo "$DOCKERHUB_PASSWORD" | docker login -u $DOCKERHUB_USERNAME --password-stdin
-    - docker push $DOCKERHUB_USERNAME/wallet-watch:server
+    - sudo docker build -t wallet-watch:server .
+    - sudo docker tag wallet-watch:server $DOCKERHUB_USERNAME/wallet-watch:server
+    - echo "$DOCKERHUB_PASSWORD" | sudo docker login -u $DOCKERHUB_USERNAME --password-stdin
+    - sudo docker push $DOCKERHUB_USERNAME/wallet-watch:server
 
 deploy:
   stage: deploy
