@@ -215,7 +215,7 @@ const MOCK_TRANSACTIONS: TransactionApiResponse[] = [
 
 // Update the Base URL without a '/' at the end.
 export const BASE_URL =
-  "http://ec2-44-222-241-16.compute-1.amazonaws.com:6001/api";
+  "http://ec2-3-239-34-101.compute-1.amazonaws.com:6001/api";
 
 // API URLs with the `${BASE_URL}/` suffix
 export const API_URLS = {
