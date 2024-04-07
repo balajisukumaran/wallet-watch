@@ -521,7 +521,6 @@ export const uploadTransactionApi = async (formData: FormData) => {
     );
     if (response.status === 200)
       toast({ description: ERROR_MESSAGES.TRANSACTION_UPLOAD });
-    throw new Error(ERROR_MESSAGES.TRANSACTION_UPLOAD_FAILURE);
   } catch (err) {
     console.error(err);
     toast({ description: ERROR_MESSAGES.TRANSACTION_UPLOAD_FAILURE });
